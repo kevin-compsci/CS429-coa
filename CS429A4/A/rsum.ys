@@ -1,0 +1,48 @@
+#Kevin Nguyen
+#kdn433
+
+	.pos 0
+	irmovq Stack, %rsp
+	rrmovq %rsp, %rbp
+	jmp main
+
+.align 8
+ele1:
+	.quad 0x00a
+	.quad ele2
+ele2:
+	.quad 0x0b0
+	.quad ele3
+ele3:
+	.quad 0xc00
+	.quad 0
+
+main:
+	irmovq ele1, %rax
+	pushq %rax
+	call rsum
+	halt
+
+rsum:
+	pushq %rbp
+	rrmovq %rsp, %rbp
+	pushq %r10
+	mrmovq 16(%rbp), %rax
+	andq %rax, %rax
+	jle Base
+	mrmovq (%rax), %r10
+	mrmovq 8(%rax), %rax
+	pushq %rax
+	call rsum
+	addq %r10, %rax
+	jmp End
+Base:
+	xorq %rax, %rax
+End:
+	mrmovq -8(%rbp), %r10
+	rrmovq %rbp, %rsp
+	popq %rbp
+	ret
+
+.pos 0x400
+Stack:

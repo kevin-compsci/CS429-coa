@@ -1,0 +1,54 @@
+#Kevin Nguyen
+#kdn433
+
+	.pos 0
+	irmovq Stack, %rsp 
+	rrmovq %rsp, %rbp
+	call main
+
+main:
+	irmovq $3, %r8
+	pushq %r8
+	irmovq dest, %r8
+	pushq %r8
+	irmovq src, %r8
+	pushq %r8
+	call copy_block
+	halt
+
+.align 8
+src:
+	.long 0x00a
+	.long 0x0b0
+	.long 0xc00
+dest:
+	.long 0x111 
+	.long 0x222 
+	.long 0x333
+
+copy_block:
+	pushq %rbp
+	rrmovq %rsp, %rbp
+	xorq %rax, %rax
+	mrmovq 16(%rbp), %rdi
+	mrmovq 24(%rbp), %rsi
+	mrmovq 32(%rbp), %rdx
+	andq %rdx, %rdx
+	jle END
+LOOP:
+	irmovq $8, %r8
+	mrmovq (%rdi), %rcx
+	rmmovq %rcx, (%rsi)
+	addq %r8, %rdi
+	addq %r8, %rsi
+	xorq %rcx, %rax
+	irmovq $1, %r8
+	subq %r8, %rdx
+	andq %rdx, %rdx
+	jg LOOP
+END:
+	popq %rbp
+	ret
+
+.pos 0x400
+Stack:
